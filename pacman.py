@@ -143,6 +143,10 @@ class GameState:
         return self.data.agentStates[0].copy()
 
     def getPacmanPosition( self ):
+        """
+
+        :rtype: object
+        """
         return self.data.agentStates[0].getPosition()
 
     def getGhostStates( self ):
