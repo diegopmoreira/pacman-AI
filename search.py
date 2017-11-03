@@ -117,8 +117,7 @@ def uniformCostSearch(problem):
     list.push((startState, []),0)
 
     while not list.isEmpty():
-        nextNode = list.pop()
-        print nextNode
+        nextNode = list.pop()        
         actualState = nextNode[0]
         direct = nextNode[1]
         cost = 0
@@ -142,6 +141,44 @@ def nullHeuristic(state, problem=None):
     goal in the provided SearchProblem.  This heuristic is trivial.
     """
     return 0
+
+
+def hillClimbingSearch(problem): 
+    from game import Directions
+    directionTable = {'South': Directions.SOUTH, 'North': Directions.NORTH, 'West': Directions.WEST, 'East': Directions.EAST}
+    startState = problem.getStartState()
+    list = util.PriorityQueue()
+    visited = set()
+    list.push((startState, []),0)
+
+    while not list.isEmpty():
+        nextNode = list.pop()
+        actualState = nextNode[0]
+        direct = nextNode[1]
+        cost = 0
+        a = 0
+        low_h = 0
+        low_state = []
+        
+
+        if problem.isGoalState(actualState):
+            cost = problem.getCostOfActions(direct)
+            print "Total cost:" + str(cost)
+            return direct
+        if actualState not in visited:
+            visited.add(actualState)
+            for i in problem.getSuccessors(actualState):                
+                a=nullHeuristic(i[0],problem)
+                if a < low_h:
+                    low_h = a
+                    low_state = i[0]
+            if i[0] not in visited:
+                list.push((low_state, direct + [directionTable[i[1]]]),0)
+    util.raiseNotDefined()
+                
+
+
+
 
 
 def aStarSearch(problem, heuristic=nullHeuristic):
