@@ -110,9 +110,8 @@ def uniformCostSearch(problem):
     from game import Directions
     directionTable = {'South': Directions.SOUTH, 'North': Directions.NORTH, 'West': Directions.WEST, 'East': Directions.EAST}
     startState = problem.getStartState()
-
     list = util.PriorityQueue()
-
+    
     visited = set()
     list.push((startState, []),0)
 
@@ -125,6 +124,7 @@ def uniformCostSearch(problem):
         if problem.isGoalState(actualState):
             cost = problem.getCostOfActions(direct)
             print "Total cost:" + str(cost)
+            print str(actualState)
             return direct
         if actualState not in visited:
             visited.add(actualState)
@@ -132,7 +132,7 @@ def uniformCostSearch(problem):
                 if i[0] not in visited:
                     list.push((i[0], direct + [directionTable[i[1]]]),0)
 
-    util.raiseNotDefined()
+    
 
 
 def nullHeuristic(state, problem=None):
@@ -143,24 +143,29 @@ def nullHeuristic(state, problem=None):
     return 0
 
 
-def hillClimbingSearch(problem): 
+def manhattanHeuristic(position, problem, info={}):
+    "The Manhattan distance heuristic for a PositionSearchProblem"
+    xy1 = position
+    xy2 = problem.goal
+    return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+
+
+def hillClimbingSearch(problem):
     from game import Directions
     directionTable = {'South': Directions.SOUTH, 'North': Directions.NORTH, 'West': Directions.WEST, 'East': Directions.EAST}
     startState = problem.getStartState()
     list = util.PriorityQueue()
     visited = set()
     list.push((startState, []),0)
-
     while not list.isEmpty():
         nextNode = list.pop()
         actualState = nextNode[0]
         direct = nextNode[1]
         cost = 0
-        a = 0
-        low_h = 0
-        low_state = []
+        hn = 0
+        low_h = manhattanHeuristic(startState,problem,0)
+        low_state = nextNode[0]
         
-
         if problem.isGoalState(actualState):
             cost = problem.getCostOfActions(direct)
             print "Total cost:" + str(cost)
@@ -168,23 +173,54 @@ def hillClimbingSearch(problem):
         if actualState not in visited:
             visited.add(actualState)
             for i in problem.getSuccessors(actualState):                
-                a=nullHeuristic(i[0],problem)
-                if a < low_h:
-                    low_h = a
-                    low_state = i[0]
-            if i[0] not in visited:
-                list.push((low_state, direct + [directionTable[i[1]]]),0)
-    util.raiseNotDefined()
+                hn=manhattanHeuristic(i[0],problem,0)
                 
+                if hn <= low_h:
+                    low_h = hn
+                    low_state = i[0]
+                if i[0] not in visited:
+                    list.push((low_state, direct + [directionTable[i[1]]]),0)   
+                   
 
 
 
 
 
-def aStarSearch(problem, heuristic=nullHeuristic):
+def aStarSearch(problem):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from game import Directions
+    directionTable = {'South': Directions.SOUTH, 'North': Directions.NORTH, 'West': Directions.WEST, 'East': Directions.EAST}
+
+    minhaFila = util.PriorityQueue()
+
+    estadosVisitados = set()  #usando conjuntos para saber os estados que ja foram visitados, pois nao ha repeticoes
+
+    estadoInicial = problem.getStartState()
+
+    minhaFila.push((estadoInicial, []), 0)
+
+
+
+    while not minhaFila.isEmpty():
+        nodoProx = minhaFila.pop()
+        estadoAtual = nodoProx[0]
+        novoPasso = nodoProx[1] #proximo 
+        count = 0
+
+        if problem.isGoalState(estadoAtual): # verifica se eh o estado final, se for, retorna o novo passo
+            print "estados visitados = " + str(len(estadosVisitados))
+            print "numero de estados para a solucao = " + str(count)
+            return novoPasso
+
+        if estadoAtual not in estadosVisitados: # se a cordenada nao estiver no conjunto de cordenadas visitadas, adiciona
+            estadosVisitados.add(estadoAtual)
+            for k in problem.getSuccessors(estadoAtual):
+                if k[0] not in estadosVisitados:
+                    count += 1
+                    cost = problem.getCostOfActions(novoPasso + [directionTable[k[1]]])
+                    minhaFila.push((k[0], novoPasso + [directionTable[k[1]]]), cost + manhattanHeuristic(k[0], problem,0))
+                    
 
 
 # Abbreviations
@@ -192,3 +228,4 @@ bfs = breadthFirstSearch
 dfs = depthFirstSearch
 astar = aStarSearch
 ucs = uniformCostSearch
+hill = hillClimbingSearch
