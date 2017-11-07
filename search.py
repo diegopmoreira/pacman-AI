@@ -171,24 +171,74 @@ def hillClimbingSearch(problem):
         if problem.isGoalState(actualState):
             cost = problem.getCostOfActions(direct)
             print "Total cost:" + str(cost)
+             
+            return direct
+        if actualState not in visited:
+            visited.add(actualState)
+            for i in problem.getSuccessors(actualState):                
+                hn=manhattanHeuristic(i[0],problem,0)
+                low_action = i[1]
+                if hn <= low_h:
+                    
+                    low_h = hn
+                    low_state = i[0]
+                    low_action = i[1]
+                
+
+                    
+                if i[0] not in visited:
+                    
+                    list.push((low_state, direct + [directionTable[str(low_action)]]),0) 
+                    
+                     
+                   
+
+def simAnnelSearch(problem):
+    from game import Directions
+    from util import random
+    directionTable = {'South': Directions.SOUTH, 'North': Directions.NORTH, 'West': Directions.WEST, 'East': Directions.EAST}
+    startState = problem.getStartState()
+    list = util.PriorityQueue()
+    visited = set()
+    list.push((startState, []),0)
+    while not list.isEmpty():
+        nextNode = list.pop()
+        actualState = nextNode[0]
+        direct = nextNode[1]
+        cost = 0
+        hn = 0
+        low_h = manhattanHeuristic(startState,problem,0)
+        low_state = nextNode[0]
+        low_action = nextNode[1]
+        
+        if problem.isGoalState(actualState):
+            cost = problem.getCostOfActions(direct)
+            print "Total cost:" + str(cost)
+             
             return direct
         if actualState not in visited:
             visited.add(actualState)
             for i in problem.getSuccessors(actualState):                
                 hn=manhattanHeuristic(i[0],problem,0)
                 
+                
                 if hn <= low_h:
                     
                     low_h = hn
                     low_state = i[0]
                     low_action = i[1]
-                    print str(i[1])
+                else:
+                    k = problem.getSuccessors(actualState)
+                    j = k[random.randint(0,len(k)-1)]
+                    low_action = j[1]
+
+                
+
+                    
                 if i[0] not in visited:
                     
-                    list.push((low_state, direct + [directionTable[str(low_action)]]),0)   
-                   
-
-
+                    list.push((low_state, direct + [directionTable[str(low_action)]]),0) 
+                    
 
 
 
@@ -235,3 +285,4 @@ dfs = depthFirstSearch
 astar = aStarSearch
 ucs = uniformCostSearch
 hill = hillClimbingSearch
+sim = simAnnelSearch
