@@ -248,34 +248,33 @@ def aStarSearch(problem):
     from game import Directions
     directionTable = {'South': Directions.SOUTH, 'North': Directions.NORTH, 'West': Directions.WEST, 'East': Directions.EAST}
 
-    minhaFila = util.PriorityQueue()
+    list = util.PriorityQueue()
 
-    estadosVisitados = set()  #usando conjuntos para saber os estados que ja foram visitados, pois nao ha repeticoes
+    visited = set()  #usando conjuntos para saber os estados que ja foram visitados, pois nao ha repeticoes
 
-    estadoInicial = problem.getStartState()
+    startState = problem.getStartState()
 
-    minhaFila.push((estadoInicial, []), 0)
+    list.push((startState, []), 0)
 
+    cost=0
 
+    while not list.isEmpty():
+        nextNode = list.pop()
+        actualState = nextNode[0]
+        direct = nextNode[1] 
 
-    while not minhaFila.isEmpty():
-        nodoProx = minhaFila.pop()
-        estadoAtual = nodoProx[0]
-        novoPasso = nodoProx[1] #proximo 
-        count = 0
+        if problem.isGoalState(actualState): 
+            cost = problem.getCostOfActions(direct)
+            print "Total cost:" + str(cost)
+            return direct
 
-        if problem.isGoalState(estadoAtual): # verifica se eh o estado final, se for, retorna o novo passo
-            print "estados visitados = " + str(len(estadosVisitados))
-            print "numero de estados para a solucao = " + str(count)
-            return novoPasso
-
-        if estadoAtual not in estadosVisitados: # se a cordenada nao estiver no conjunto de cordenadas visitadas, adiciona
-            estadosVisitados.add(estadoAtual)
-            for k in problem.getSuccessors(estadoAtual):
-                if k[0] not in estadosVisitados:
-                    count += 1
-                    cost = problem.getCostOfActions(novoPasso + [directionTable[k[1]]])
-                    minhaFila.push((k[0], novoPasso + [directionTable[k[1]]]), cost + manhattanHeuristic(k[0], problem,0))
+        if actualState not in visited: # se a cordenada nao estiver no conjunto de cordenadas visitadas, adiciona
+            visited.add(actualState)
+            for k in problem.getSuccessors(actualState):
+                if k[0] not in visited:
+                   
+                    cost = problem.getCostOfActions(direct + [directionTable[k[1]]])
+                    list.push((k[0], direct + [directionTable[k[1]]]), cost + manhattanHeuristic(k[0], problem,0))
                     
 
 
